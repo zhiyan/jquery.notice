@@ -1,0 +1,27 @@
+{
+  "name": "jquery.notice",
+  "title": "jQuery Notice",
+  "description": "A simple jQuery notice & popup plugin by ian",
+  "version": "0.1.0",
+  "homepage": "https://github.com/zhiyan/jquery.notice",
+  "author": {
+    "name": "ian",
+    "email": "zhiyan1987@gmail.com",
+    "url": "http://ianzoe.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zhiyan/jquery.notice.git"
+  },
+  "bugs": "https://github.com/zhiyan/jquery.notice/issues",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/zhiyan/jquery.notice/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "*"
+  },
+  "keywords": []
+}
