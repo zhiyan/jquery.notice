@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jquery.notice test</title>
+	<link rel="stylesheet" href="../dist/jquery.notice.css">
+	<style>
+		*{margin:0;padding:0;}
+	</style>
+	<script src="../libs/jquery/jquery.js"></script>
+	<script src="../dist/jquery.notice.js"></script>
+	<script>
+		$(document).on("click","#default",function(){
+			$.notice({
+				"title":"the title",
+				"content":"the content"
+			});
+		})
+		$(function(){
+			$.notice({
+				"type":"modal",
+				"title":"test",
+				"content":"错误信息",
+				"width":"500px",
+				"confirm" : "确定",
+				"callback":function(){
+					alert(6)
+				}
+			});
+		})
+	</script>
+</head>
+<body>
+	<button id="default">默认dialog</button><br>
+	<button id="default">默认dialog</button><br>
+	<button id="default">默认dialog</button><br>
+</body>
+</html>

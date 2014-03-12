@@ -1,105 +1,154 @@
-/*! jQuery Notice - v0.1.0 - 2013-11-19
+/*! jQuery Notice - v0.1.0 - 2014-03-12
 * https://github.com/zhiyan/jquery.notice
-* Copyright (c) 2013 ian; Licensed MIT */
+* Copyright (c) 2014 ian; Licensed MIT */
 (function($) {
 
-  var $win = $(window),
-    $doc = $(document);
+  var $doc = $(document),
+      $win = $(window),
+      defaultOptions,
+      maskTemplate;
+
+  //default options
+  defaultOptions = {
+    "class" : "jnotice",
+    "type" : "dialog",
+    "maskClass" : "jnotice-mask",
+    "closeClass" : "jnotice-close",
+    "headerClass" : "jnotice-header",
+    "footerClass" : "jnotice-footer",
+    "contentClass" : "jnotice-content",
+    "buttonClassA" : "jnotice-button-a",
+    "buttonClassB" : "jnotice-button-b",
+    "width": "auto",
+    "height":"auto",
+    "position":"absolute",
+    "esc":true,
+    "cancel" : "取消" ,
+    "confirm" : "确定"
+  };
+
+  // default template
+  defaultOptions.template = '<div class="{{class}} {{class}}-{{type}}" style="width:{{width}};height:{{height}};position:{{position}};"><h3 class="{{headerClass}}"><span>{{title}}</span><i class="{{closeClass}}">X</i></h3><div class="{{contentClass}}">{{content}}</div><div class="{{footerClass}}"></div></div>';
+  // default foot template
+  defaultOptions.buttonTemplate = '<button class="{{class}}-button {{buttonClass}}">{{text}}</button>';
+  // mask template
+  maskTemplate = '<div class="{{maskClass}}"></div>';
+
 
   //notice class
   function Notice(options) {
-    var html = "",
-      obj,
-      that = this,
-      container,
-      btnHref = "",
-      classWrap = "notice";
-    //provide overlap
-    if ($(".notice:visible").length) {
-      $(".notice").remove();
+    var that = this,
+        nid = +new Date,
+        notice;
+
+    // build notice dom
+    notice = $( this.tmpl( options.template, options ) );
+
+
+    // attribute
+    this.options = options;
+    this.source = notice;
+    this._id = nid;
+
+    // build foot
+    this.buttons();
+
+    // close event
+    notice.find("."+options.closeClass).on("click",$.proxy(that.close,that));
+
+    // make mask
+    this.makeMask();
+
+    $("body").append( notice );
+
+    // position
+    this.position();
+
+    // resize window
+    $win.on("resize",$.proxy(that.position,that));
+
+    // esc
+    if( options.esc ){
+      this.esc();
     }
-    if (typeof options === "object"){
-      $.extend(this, options);
-    }
-    else if (typeof options === "string") {
-      this.content = options;
-    }
-    container = $(this.container);
-    classWrap += " " + this["class"] || "";
-    //template
-    html = '<div class="' + classWrap + '"><div class="inner-top"><h3>' + this.title + '</h3><div class="close"></div></div><div class="inner-middle">' + this.content + '</div><div class="inner-bottom"><div class="notice-btn">';
-    //callback
-    if ( !! this.buttonName && this.buttonDo) {
-      if (typeof this.buttonDo === "string"){
-        btnHref = this.buttonDo;
-      }
-      html += '<a href="' + btnHref + '" class="inner-btn button-do" style="margin-right:10px;">' + this.buttonName + '</a>';
-    }
-    if (!this.cancelhide){
-      html += '<a href="" class="inner-btn cancel">' + this.cancelName + '</a>';
-    }
-    html += '</div></div></div>';
-    //create obj
-    obj = $(html);
-    //button callback
-    if (typeof this.buttonDo === "function") {
-      obj.find(".button-do").click(function() {
-        that.buttonDo();
-        that.close(obj);
-        return false;
-      });
-    }
-    obj.find(".close,.cancel").click(function() {
-      that.close(obj);
-      if (typeof that.callback === "function") {
-        that.callback();
-      }
-      return false;
-    });
-    //free memory
-    html = null;
-    //add to page
-    container.append(obj);
-    //obj position
-    if (container[0] === document.body) {
-      that.makeCenter(obj);
-    }
-    //esc to quit
-    if (obj.find(".close,.cancel").length) {
-      $doc.bind("keydown", {
-        "obj": obj
-      }, that.escQuit);
-    }
+
   }
+
+  // prototype
   Notice.prototype = {
-    "title": "Notice",
-    "content": "",
-    "container": document.body,
-    "cancelName": "Cancel",
-    close: function(obj) {
-      obj.remove();
-      $doc.unbind("keydown", this.escQuit);
+    tmpl:function( str, data ){
+      $.each( data, function(i,v){
+        str = str.replace( new RegExp("{{"+i+"}}","g"), v || "" );
+      });
+      str = str.replace( /{{[^}]*}}/g, "" );
+      return str;
     },
-    makeCenter: function(obj) {
-      var w = parseInt(-obj.width()/2,10),
-          t = parseInt(-obj.height()/2,10);
-      obj.css({
-        "position": "absolute",
-        "left": "50%",
-        "top": $doc.scrollTop() + $win.height() / 2,
-        "margin-left" : w,
-        "margin-top" : t
+    close: function() {
+      this.source.remove();
+      this.removeMask();
+      if( this.options.esc )
+        $doc.off("keydown");
+    },
+    position:function(){
+      var notice = this.source,
+          width = notice.width(),
+          height = notice.height();
+
+      notice.css({"margin-left":-width/2,"margin-top":-height/2});
+
+      // fix scroll for absolute
+      if( notice.css("position") === "absolute" ){
+        notice.css({
+          "top": $doc.scrollTop() + $win.height() / 2
+        });
+      }
+
+    },
+    makeMask:function(){
+      var options = this.options,
+          $mask =$("."+options.maskClass), 
+          className = options.mask;
+      if( !$mask.length ){
+        $mask = $( this.tmpl(maskTemplate,{"maskClass":options.maskClass}) );
+        $("body").append($mask);
+      }else{
+        $mask.show();
+      }
+      this.mask = $mask;
+    },
+    removeMask:function(){
+      this.mask.hide();
+    },
+    esc:function(){
+      var that = this;
+      $doc.on("keydown", function(e){
+         if (+e.keyCode === 27) { 
+            that.close();
+         }
       });
     },
-    escQuit: function(e) {
-      if (+e.keyCode === 27) {
-        e.data.obj.find(".close").trigger("click");
+    buttons:function(){
+      var that = this,
+          options = this.options,
+          notice = this.source,
+          html = "";
+      if( !!options.callback ){
+        html += this.tmpl( options.buttonTemplate, {"buttonClass":options.buttonClassA,"text":options.confirm || "确定"});
+        notice.on("click","."+options.buttonClassA,function(){
+          options.callback();
+          that.close();
+        });
       }
+      if( !!options.cancel ){
+        html += this.tmpl( options.buttonTemplate, {"buttonClass":options.closeClass,"class":options.class,"text":options.cancel});
+      }
+      notice.find("."+options.footerClass).append(html);
     }
   };
 
-  // Static method.
-  $.jquery_notice = function(options) {
+  // export
+  $.notice = function(options) {
+    options = $.extend({},defaultOptions,options);
     return new Notice(options);
   };
 
