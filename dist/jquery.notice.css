@@ -59,6 +59,9 @@
 	font-size:12px;
 	text-align: center;
 }
+.jnotice-notice .jnotice-content,.jnotice-notice .jnotice-footer{
+	display: none;
+}
 .jnotice-mask{
 	width: 100%;
 	height: 100%;

@@ -1,11 +1,11 @@
 {
   "name": "jquery.notice",
   "title": "jQuery Notice",
-  "description": "A simple jQuery notice & popup plugin by ian",
+  "description": "jQuery建议弹框插件",
   "version": "0.1.0",
   "homepage": "https://github.com/zhiyan/jquery.notice",
   "author": {
-    "name": "ian",
+    "name": "zhiyan",
     "email": "zhiyan1987@gmail.com",
     "url": "http://ianzoe.com/"
   },

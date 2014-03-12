@@ -10,29 +10,42 @@
 	<script src="../libs/jquery/jquery.js"></script>
 	<script src="../dist/jquery.notice.js"></script>
 	<script>
-		$(document).on("click","#default",function(){
+		$(document).on("click","#dialog",function(){
 			$.notice({
+				// "type":"dialog"
 				"title":"the title",
-				"content":"the content"
-			});
-		})
-		$(function(){
-			$.notice({
-				"type":"modal",
-				"title":"test",
-				"content":"错误信息",
+				"content":"the content",
 				"width":"500px",
-				"confirm" : "确定",
+				"position":"fixed",
+				// "cancel":false,
+				"confirm":"确定",
 				"callback":function(){
-					alert(6)
+					alert("ok!");
 				}
 			});
-		})
+		});
+		$(document).on("click","#notice",function(){
+			$.notice({
+				"type":"notice",
+				"title":"the title",
+				"content":"the content",
+				"width":"400px"
+			});
+		});
+		var html="<div>1111<h2>3333</h2><p>331212</p></div>";
+		$(document).on("click","#modal",function(){
+			$.notice({
+				"type":"modal",
+				"title":"the title",
+				"content":html,
+				"cancel":"关闭"
+			});
+		});
 	</script>
 </head>
 <body>
-	<button id="default">默认dialog</button><br>
-	<button id="default">默认dialog</button><br>
-	<button id="default">默认dialog</button><br>
+	<button id="dialog">默认dialog</button><br>
+	<button id="notice">notice</button><br>
+	<button id="modal">modal</button><br>
 </body>
 </html>
